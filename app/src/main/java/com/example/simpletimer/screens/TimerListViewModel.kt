@@ -7,7 +7,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import java.time.Duration
 
-data class Timer(var name: MutableState<String>, val time: Duration)
+data class Timer(
+    val name: MutableState<String>,
+    val time: Duration,
+    val editingName: MutableState<Boolean> = mutableStateOf(false)
+)
 
 class TimerListViewModel : ViewModel() {
     val timersList = mutableStateListOf<Timer>(

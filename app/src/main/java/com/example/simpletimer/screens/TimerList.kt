@@ -46,11 +46,19 @@ import com.example.simpletimer.toDisplayString
 
 @Composable
 fun TimerList(timerListViewModel: TimerListViewModel = viewModel()) {
-
     val timersList = timerListViewModel.timersList
+
     // A surface container using the 'background' color from the theme
     Surface(
-        modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    timersList.map {
+                        it.editingName.value = false
+                    }
+                })
+            }, color = MaterialTheme.colorScheme.background
     ) {
         LazyColumn {
             items(items = timersList) { timer ->
@@ -59,44 +67,41 @@ fun TimerList(timerListViewModel: TimerListViewModel = viewModel()) {
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {
-        FloatingActionButton(
-            modifier = Modifier
-                .padding(16.dp)
-                .align(alignment = Alignment.BottomEnd),
+        FloatingActionButton(modifier = Modifier
+            .padding(16.dp)
+            .align(alignment = Alignment.BottomEnd),
             onClick = { timerListViewModel.addTimer() }) {
             Icon(Icons.Filled.Add, contentDescription = "Add timer")
         }
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun TimerCard(viewModel: TimerListViewModel, timer: Timer) {
+fun TimerCard(
+    viewModel: TimerListViewModel, timer: Timer
+) {
     val focusRequester = remember { FocusRequester() }
-    var editingName by remember { mutableStateOf(false) }
+    val showEditText by remember { mutableStateOf(false) }
 
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .padding(2.dp)
-        .pointerInput(Unit) {
-            detectTapGestures(onTap = {
-                editingName = false
-            })
-        }) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(2.dp)
+    ) {
         Row(
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            if (editingName) {
+            if (timer.editingName.value) {
                 BasicTextField(
                     value = timer.name.value,
                     onValueChange = { timer.name.value = it },
                     textStyle = MaterialTheme.typography.titleMedium,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
-                        editingName = false
+                        timer.editingName.value = false
                     }),
                     modifier = Modifier.focusRequester(focusRequester)
                 )
@@ -104,11 +109,10 @@ fun TimerCard(viewModel: TimerListViewModel, timer: Timer) {
                     focusRequester.requestFocus()
                 }
             } else {
-                ClickableText(
-                    AnnotatedString(timer.name.value),
+                ClickableText(AnnotatedString(timer.name.value),
                     style = MaterialTheme.typography.titleMedium,
                     onClick = {
-                        editingName = true
+                        timer.editingName.value = true
                     })
                 Button(
                     onClick = { viewModel.deleteTimer(timer) },
