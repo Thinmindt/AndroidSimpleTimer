@@ -28,12 +28,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -42,10 +38,14 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.simpletimer.toDisplayString
 
 @Composable
-fun TimerList(timerListViewModel: TimerListViewModel = viewModel()) {
+fun TimerList(
+    navHostController: NavHostController,
+    timerListViewModel: TimerListViewModel = viewModel()
+) {
     val timersList = timerListViewModel.timersList
 
     // A surface container using the 'background' color from the theme
@@ -70,7 +70,7 @@ fun TimerList(timerListViewModel: TimerListViewModel = viewModel()) {
         FloatingActionButton(modifier = Modifier
             .padding(16.dp)
             .align(alignment = Alignment.BottomEnd),
-            onClick = { timerListViewModel.addTimer() }) {
+            onClick = { navHostController.navigate("newTimerForm") }) {
             Icon(Icons.Filled.Add, contentDescription = "Add timer")
         }
     }
@@ -81,7 +81,6 @@ fun TimerCard(
     viewModel: TimerListViewModel, timer: Timer
 ) {
     val focusRequester = remember { FocusRequester() }
-    val showEditText by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
