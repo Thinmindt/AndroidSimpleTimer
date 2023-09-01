@@ -9,6 +9,7 @@ import com.example.simpletimer.data.TimerRoom
 import com.example.simpletimer.data.TimerRoomDao
 import io.reactivex.rxjava3.observers.TestObserver
 import io.reactivex.rxjava3.schedulers.TestScheduler
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -22,9 +23,7 @@ class TimerRoomDaoTest {
 
     @Before
     fun setup() {
-        database = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(), TimerDatabase::class.java
-        ).build()
+        database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), TimerDatabase::class.java).build()
         timerDao = database.timerRoomDao()
     }
 
@@ -34,44 +33,30 @@ class TimerRoomDaoTest {
     }
 
     @Test
-    fun testInsertAndRetrieveTimer() {
+    fun testInsertAndRetrieveTimer() = runBlocking {
         val timer = TimerRoom(id = 1, title = "Test Timer", duration = "00:01:00")
 
-        val testScheduler = TestScheduler()
-
         // Insert timer
-        val addTestObserver = timerDao.addTimer(timer).subscribeOn(testScheduler).test()
-        addTestObserver.assertComplete()
-
-        // Advance the scheduler to trigger the completion of addTimer
-        testScheduler.triggerActions()
+        timerDao.addTimer(timer)
 
         // Retrieve timer and assert values
-        val getAllTestObserver = timerDao.getAll().subscribeOn(testScheduler).test()
-        testScheduler.triggerActions()
-
-        getAllTestObserver.assertValue { timers ->
-            timers.isNotEmpty() && timers[0] == timer
-        }
+        val timers = timerDao.getAll()
+        assert(timers.isNotEmpty())
+        assert(timers[0] == timer)
     }
 
     @Test
-    fun testDeleteTimer() {
+    fun testDeleteTimer() = runBlocking {
         val timer = TimerRoom(id = 1, title = "Test Timer", duration = "00:01:00")
 
         // Insert timer
-        timerDao.addTimer(timer).test().assertComplete()
+        timerDao.addTimer(timer)
 
         // Delete timer
-        timerDao.delete(timer).test().assertComplete()
+        timerDao.delete(timer)
 
         // Retrieve timers and assert list is empty
-        timerDao.getAll().test()
-            .await()
-            .assertComplete()
-            .assertValue{ timers ->
-                Log.i("test", "value = $timers")
-                timers.isEmpty()
-            }
+        val timers = timerDao.getAll()
+        assert(timers.isEmpty())
     }
 }

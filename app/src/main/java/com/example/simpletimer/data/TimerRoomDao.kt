@@ -4,18 +4,15 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
 
 @Dao
 interface TimerRoomDao {
     @Query("SELECT * FROM timers")
-    fun getAll(): Observable<List<TimerRoom>>
+    suspend fun getAll(): List<TimerRoom>
 
     @Delete
-    fun delete(timer: TimerRoom): Single<Int>
+    suspend fun delete(timer: TimerRoom)
 
     @Insert
-    fun addTimer(timer: TimerRoom): Completable
+    suspend fun addTimer(timer: TimerRoom)
 }
