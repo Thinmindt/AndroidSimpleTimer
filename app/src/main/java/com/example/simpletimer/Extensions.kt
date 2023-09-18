@@ -1,8 +1,12 @@
 package com.example.simpletimer
 
-import java.time.Duration
+import kotlin.time.Duration
 
 
 fun Duration.toDisplayString(): String {
-    return "${this.toHours()}:${this.toMinutes() % 60}:${seconds % 60}"
+    val seconds = this.inWholeSeconds
+    val hours = seconds / 3600 // number of seconds in an hour
+    val minutes = (seconds % 3600) / 60
+    val remainingSeconds = seconds % 60
+    return String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
 }

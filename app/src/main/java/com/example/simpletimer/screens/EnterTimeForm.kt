@@ -93,7 +93,10 @@ fun EnterTimeForm(
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                     contentPadding = PaddingValues(0.dp),
                     enabled = enterTimeFormViewModel.hmsString.value.toInt() > 0,
-                    onClick = { enterTimeFormViewModel.submitTimer() }) {
+                    onClick = {
+                        enterTimeFormViewModel.submitTimer()
+                        navHostController.navigate("timerList")
+                    }) {
                     Icon(imageVector = Icons.Rounded.Add, contentDescription = "Submit Timer")
                 }
                 Spacer(Modifier.width(100.dp))

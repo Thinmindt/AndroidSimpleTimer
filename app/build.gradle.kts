@@ -19,6 +19,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["room.schemaLocation"] = "$projectDir/schemas"
+            }
+        }
     }
 
     buildTypes {
@@ -71,6 +76,7 @@ dependencies {
     // JUnit tests
     testImplementation("junit:junit:4.13.2")
     implementation("androidx.test.ext:junit-ktx:1.1.5")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 
     // Room Persistence
     val roomVersion = "2.5.2"
